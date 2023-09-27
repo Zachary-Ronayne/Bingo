@@ -1,6 +1,10 @@
+import Grid from "./Grid";
+
 const BingoGame = () => {
   document.title = "BINGO";
-  return <>BINGOOOOOOOO</>;
+  return <>
+    <Grid/>
+  </>;
 }
 
 export default BingoGame;
