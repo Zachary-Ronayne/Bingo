@@ -20,7 +20,7 @@ const Grid: FC<GridProps> = (props) => {
   const [board, setBoard] = useState<BoardSpot[][]>([]);
 
   useEffect(() => {
-    randomWords(initBoard(board));
+    if(board.length == 0) randomWords(initBoard(board));
   }, [props]);
 
   const initBoard = (board: BoardSpot[][]) => {
@@ -29,6 +29,18 @@ const Grid: FC<GridProps> = (props) => {
       newBoard.push([]);
       for(let x = 0; x < props.width; x++){
         newBoard[y].push({text: "", filled: false});
+      }
+    }
+    setBoard(newBoard);
+    return newBoard;
+  }
+
+  const resetSpaces = (board: BoardSpot[][]) => {
+    let newBoard = [...board];
+    for(let y = 0; y < props.height; y++){
+      newBoard.push([]);
+      for(let x = 0; x < props.width; x++){
+        newBoard[x][y].filled = false;
       }
     }
     setBoard(newBoard);
@@ -80,7 +92,7 @@ const Grid: FC<GridProps> = (props) => {
           fontSize: "29px", border: "2px solid #DDDDDD", background: "#222222", 
           width: "200px", textAlign: "center", color: "#DDDDDD", margin: "30px", padding: "20px"
         }}
-        onClick={() => initBoard(board)}
+        onClick={() => resetSpaces(board)}
       >
         RESET SPACES
       </div>
