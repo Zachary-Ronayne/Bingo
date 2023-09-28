@@ -7,6 +7,8 @@ const { Panel } = Collapse;
 export const KEY_TITLE = "title";
 export const KEY_FREE_SPACE = "freeSpace";
 export const KEY_WORDS = "words";
+export const KEY_HEIGHT = "height";
+export const KEY_WIDTH = "width";
 
 interface SaveValue{
   d: any;
@@ -27,6 +29,8 @@ const BingoGame = () => {
   const [words, setWords] = useState<string[]>([]);
   const [freeSpace, setFreeSpace] = useState<string>("");
   const [title, setTitle] = useState<string | undefined>(undefined);
+  const [width, setWidth] = useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
 
   const [wordsText, setWordsText] = useState<string>("");
 
@@ -37,6 +41,8 @@ const BingoGame = () => {
     setWords(w);
     setWordsText(w.join("\n"));
   }, d: []};
+  saveKeys[KEY_WIDTH] = {set: setWidth, d: 5};
+  saveKeys[KEY_HEIGHT] = {set: setHeight, d: 5};
   
   const updateKey = (key: string, value: any) => {
     saveKeys[key].set(value);
@@ -55,6 +61,8 @@ const BingoGame = () => {
     })
   }, []);
 
+  const simpleInput = (key: string, value: any) => <Input value={value} onChange={e => updateKey(key, e?.target?.value ?? "")}/>
+
   return <div style={{textAlign: "center", margin: "20px"}}>
     <div
       style={{
@@ -65,8 +73,8 @@ const BingoGame = () => {
       {title}
     </div>
     <Grid
-      width={5}
-      height={5}
+      width={width}
+      height={height}
       words={words}
       freeSpace={freeSpace}
     />
@@ -76,7 +84,7 @@ const BingoGame = () => {
 
     {/* TODO style this */}
     {/* TODO store this state in the local storage */}
-    <Collapse style={{fontSize: "20px", border: "2px solid #DDDDDD", background: "#DDDDDD", color: "#DDDDDD"}}>
+    <Collapse style={{fontSize: "20px", border: "2px solid #DDDDDD", background: "#DDDDDD", color: "#DDDDDD", width: "1200px"}}>
       <Panel header="Options" key="options">
         Terms
         <TextArea rows={10} value={wordsText} onChange={e => {
@@ -85,9 +93,13 @@ const BingoGame = () => {
           updateKey(KEY_WORDS, s.split("\n"));
         }} />
         Free space
-        <Input value={freeSpace} onChange={e => updateKey(KEY_FREE_SPACE, e?.target?.value ?? "")}/>
+        {simpleInput(KEY_FREE_SPACE, freeSpace)}
         Title
-        <Input value={title} onChange={e => updateKey(KEY_TITLE, e?.target?.value ?? "")}/>
+        {simpleInput(KEY_TITLE, title)}
+        Width
+        {simpleInput(KEY_WIDTH, width)}
+        Height
+        {simpleInput(KEY_HEIGHT, height)}
       </Panel>
     </Collapse>
   </div>;

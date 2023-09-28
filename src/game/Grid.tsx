@@ -26,8 +26,8 @@ const Grid: FC<GridProps> = (props) => {
     let b = getSave(KEY_BOARD);
     // If there is no board yet, set it to empty
     if(!b) b = [];
-    // If the current board is empty, or the width or height are different, init it
-    if(b.length == 0 || (props.width != b.length || props.width != b[0].height)) {
+    // If the current board is empty, init it
+    if(b.length == 0) {
       b = initBoard();
       randomWords(b);
     }
@@ -65,6 +65,9 @@ const Grid: FC<GridProps> = (props) => {
   }
 
   const randomWords = (board: BoardSpot[][]) => {
+    // If the current board is empty, or the width or height are different, init it first
+    if(board.length == 0 || (props.width != board.length || props.height != board[0].length)) board = initBoard();
+
     let newBoard = [...board];
     let remaining = [...props.words];
     for(let x = 0; x < props.height; x++){
@@ -124,27 +127,29 @@ const Grid: FC<GridProps> = (props) => {
         NEW BOARD
       </div>
     </Row>
-    {board.map((row, x) => <Row>
-      {row.map((col, y) => <Col>
-        <div
-          key={"grid_" + x + "_" + y}
-          style={{
-            border: "2px solid #DDDDDD", padding: "20px",
-            background: col.filled ? "#BB0000" : "#222222", fontSize: "29px", color: "#DDDDDD",
-            userSelect: "none",
-            width: GRID_SIZE + "px", height: GRID_SIZE + "px"
-          }}
-          onClick={() => {
-            toggleClicked(x, y);
-          }}
-        >
-          <div style={{fontSize: findFontSize(col.text)}} key={"text_" + x + "_" + y}>
-            {col.text}
+    <div style={{overflowX: "auto", width: "max-content"}}>
+      {board.map((row, x) => <Row >
+        {row.map((col, y) => <Col>
+          <div
+            key={"grid_" + x + "_" + y}
+            style={{
+              border: "2px solid #DDDDDD", padding: "20px",
+              background: col.filled ? "#BB0000" : "#222222", fontSize: "29px", color: "#DDDDDD",
+              userSelect: "none",
+              width: GRID_SIZE + "px", height: GRID_SIZE + "px"
+            }}
+            onClick={() => {
+              toggleClicked(x, y);
+            }}
+          >
+            <div style={{fontSize: findFontSize(col.text)}} key={"text_" + x + "_" + y}>
+              {col.text}
+            </div>
           </div>
-        </div>
-      </Col>)}
-    </Row>)
-  }</>;
+        </Col>)}
+      </Row>)
+    }</div>
+  </>;
 };
 
 export default Grid;
