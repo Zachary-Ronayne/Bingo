@@ -26,8 +26,8 @@ const Grid: FC<GridProps> = (props) => {
     let b = getSave(KEY_BOARD);
     // If there is no board yet, set it to empty
     if(!b) b = [];
-    // If the current board is empty, init it
-    if(b.length == 0) {
+    // If the current board is empty, or the width or height are different, init it
+    if(b.length == 0 || (props.width != b.length || props.width != b[0].height)) {
       b = initBoard();
       randomWords(b);
     }
@@ -67,11 +67,11 @@ const Grid: FC<GridProps> = (props) => {
   const randomWords = (board: BoardSpot[][]) => {
     let newBoard = [...board];
     let remaining = [...props.words];
-    for(let x = 0; x < props.width; x++){
-      for(let y = 0; y < props.height; y++){
+    for(let x = 0; x < props.height; x++){
+      for(let y = 0; y < props.width; y++){
         newBoard[x][y].filled = false;
         // Check for free space
-        if(Math.floor(props.width / 2) === x && Math.floor(props.height / 2) === y){
+        if(Math.floor(props.height / 2) === x && Math.floor(props.width / 2) === y){
           newBoard[x][y].text = props.freeSpace;
           continue;
         }
