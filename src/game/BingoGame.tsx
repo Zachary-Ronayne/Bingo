@@ -1,16 +1,59 @@
 import { Collapse, Input } from "antd";
 import Grid from "./Grid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 const { Panel } = Collapse;
+
+export const KEY_TITLE = "title";
+export const KEY_FREE_SPACE = "freeSpace";
+export const KEY_WORDS = "words";
+
+interface SaveValue{
+  d: any;
+  set: (value: any) => void;
+}
+
+export const getSave = (key: string) => {
+  return JSON.parse(localStorage.getItem(key));
+}
+
+export const setSave = (key: string, value: any) => {
+  localStorage.setItem(key, JSON.stringify(value));
+}
 
 const BingoGame = () => {
   document.title = "BINGO";
 
   const [words, setWords] = useState<string[]>([]);
+  const [freeSpace, setFreeSpace] = useState<string>("");
+  const [title, setTitle] = useState<string | undefined>(undefined);
+
   const [wordsText, setWordsText] = useState<string>("");
-  const [freeSpace, setFreeSpace] = useState<string>("(FREE SPACE)");
-  const [title, setTitle] = useState<string>("BINGO");
+
+  const saveKeys = {};
+  saveKeys[KEY_TITLE] = {set: setTitle, d: "BINGO"};
+  saveKeys[KEY_FREE_SPACE] = {set: setFreeSpace, d: "(FREE SPACE)"};
+  saveKeys[KEY_WORDS] = {set: w => {
+    setWords(w);
+    setWordsText(w.join("\n"));
+  }, d: []};
+  
+  const updateKey = (key: string, value: any) => {
+    saveKeys[key].set(value);
+    setSave(key, value);
+  }
+
+  useEffect(() => {
+    Object.keys(saveKeys).forEach(k => {
+      let value = getSave(k);
+      let setting: SaveValue = saveKeys[k];
+      if(value == null) {
+        value = setting.d;
+        setSave(k, value);
+      }
+      setting.set(value);
+    })
+  }, []);
 
   return <div style={{textAlign: "center", margin: "20px"}}>
     <div
@@ -39,12 +82,12 @@ const BingoGame = () => {
         <TextArea rows={10} value={wordsText} onChange={e => {
           let s = e?.target?.value ?? "";
           setWordsText(s);
-          setWords(s.split("\n"));
+          updateKey(KEY_WORDS, s.split("\n"));
         }} />
         Free space
-        <Input value={freeSpace} onChange={e => setFreeSpace(e?.target?.value ?? "")}/>
+        <Input value={freeSpace} onChange={e => updateKey(KEY_FREE_SPACE, e?.target?.value ?? "")}/>
         Title
-        <Input value={title} onChange={e => setTitle(e?.target?.value ?? "")}/>
+        <Input value={title} onChange={e => updateKey(KEY_TITLE, e?.target?.value ?? "")}/>
       </Panel>
     </Collapse>
   </div>;

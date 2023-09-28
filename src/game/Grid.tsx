@@ -1,5 +1,6 @@
 import { Row, Col } from "antd";
 import { FC, useEffect, useState } from "react";
+import { getSave, setSave } from "./BingoGame";
 
 export interface BoardSpot{
   text: string;
@@ -13,17 +14,34 @@ interface GridProps{
   freeSpace: string;
 }
 
-const Grid: FC<GridProps> = (props) => {
+export const KEY_BOARD = "board";
 
+const Grid: FC<GridProps> = (props) => {
   const GRID_SIZE = 110;
   const TEXT_SCALER = 9000;
   const [board, setBoard] = useState<BoardSpot[][]>([]);
-
+  
   useEffect(() => {
-    if(board.length == 0) randomWords(initBoard(board));
+    // Get the current saved board
+    let b = getSave(KEY_BOARD);
+    // If there is no board yet, set it to empty
+    if(!b) b = [];
+    // If the current board is empty, init it
+    if(b.length == 0) {
+      b = initBoard();
+      randomWords(b);
+    }
+    // Otherwise, just set the object
+    else setBoard(b);
   }, [props]);
 
-  const initBoard = (board: BoardSpot[][]) => {
+  // Both set the current board and save it to storage
+  const updateBoard = (b: BoardSpot[][]) => {
+    setBoard(b);
+    setSave(KEY_BOARD, b);
+  }
+  
+  const initBoard = () => {
     let newBoard: BoardSpot[][] = [];
     for(let y = 0; y < props.height; y++){
       newBoard.push([]);
@@ -31,7 +49,6 @@ const Grid: FC<GridProps> = (props) => {
         newBoard[y].push({text: "", filled: false});
       }
     }
-    setBoard(newBoard);
     return newBoard;
   }
 
@@ -43,7 +60,7 @@ const Grid: FC<GridProps> = (props) => {
         newBoard[x][y].filled = false;
       }
     }
-    setBoard(newBoard);
+    updateBoard(newBoard);
     return newBoard;
   }
 
@@ -52,6 +69,7 @@ const Grid: FC<GridProps> = (props) => {
     let remaining = [...props.words];
     for(let x = 0; x < props.width; x++){
       for(let y = 0; y < props.height; y++){
+        newBoard[x][y].filled = false;
         // Check for free space
         if(Math.floor(props.width / 2) === x && Math.floor(props.height / 2) === y){
           newBoard[x][y].text = props.freeSpace;
@@ -69,14 +87,14 @@ const Grid: FC<GridProps> = (props) => {
         remaining.splice(i, 1);
       }
     }
-    setBoard(newBoard);
+    updateBoard(newBoard);
     return newBoard;
   }
 
   const toggleClicked = (x: number, y: number) => {
     let newBoard = [...board];
     newBoard[x][y].filled = !board[x][y].filled;
-    setBoard(newBoard);
+    updateBoard(newBoard);
   } 
 
   const findFontSize = (s: string) => {
@@ -109,6 +127,7 @@ const Grid: FC<GridProps> = (props) => {
     {board.map((row, x) => <Row>
       {row.map((col, y) => <Col>
         <div
+          key={"grid_" + x + "_" + y}
           style={{
             border: "2px solid #DDDDDD", padding: "20px",
             background: col.filled ? "#BB0000" : "#222222", fontSize: "29px", color: "#DDDDDD",
@@ -119,7 +138,7 @@ const Grid: FC<GridProps> = (props) => {
             toggleClicked(x, y);
           }}
         >
-          <div style={{fontSize: findFontSize(col.text)}}>
+          <div style={{fontSize: findFontSize(col.text)}} key={"text_" + x + "_" + y}>
             {col.text}
           </div>
         </div>
