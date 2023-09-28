@@ -63,28 +63,29 @@ const BingoGame = () => {
 
   const simpleInput = (key: string, value: any) => <Input value={value} onChange={e => updateKey(key, e?.target?.value ?? "")}/>
 
-  return <div style={{textAlign: "center", margin: "20px"}}>
+  return <div style={{textAlign: "center", margin: "40px"}}>
     <div
       style={{
-        padding: "20px", fontSize: "80px", border: "2px solid #DDDDDD", background: "#222222", color: "#DDDDDD",
-        width: "800px"
+        padding: "20px 50px 20px 50px", fontSize: "80px", border: "2px solid #DDDDDD", background: "#222222", color: "#DDDDDD",
+        display: "inline-block",
+        flexDirection: "column",
+        alignItems: "center"
       }}
     >
       {title}
     </div>
-    <Grid
-      width={width}
-      height={height}
-      words={words}
-      freeSpace={freeSpace}
-    />
-    <br/>
+    <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+      <Grid
+        width={width}
+        height={height}
+        words={words}
+        freeSpace={freeSpace}
+      />
+    </div>
     <div style={{padding: "150px"}} />
-    <br/>
 
     {/* TODO style this */}
-    {/* TODO store this state in the local storage */}
-    <Collapse style={{fontSize: "20px", border: "2px solid #DDDDDD", background: "#DDDDDD", color: "#DDDDDD", width: "1200px"}}>
+    <Collapse style={{fontSize: "20px", border: "2px solid #DDDDDD", background: "#DDDDDD", width: "1200px"}}>
       <Panel header="Options" key="options">
         Terms
         <TextArea rows={10} value={wordsText} onChange={e => {
